@@ -117,22 +117,33 @@ function startLikingVideos() {
 function clickVideos(startIndex: number) {
     // Get all video thumbnails on the page
     const videos = document.querySelectorAll(YOUTUBE_VIDEO_THUMBNAIL);
-    console.log('new count of the total videos', videos.length);
+    console.log('new count of the total videos', videos);
 
     // Keep track of the current video index
     let videoIndex = startIndex;
 
     // Set up an interval to click on the video thumbnails
-    const interval = setInterval(function (videos) {
+    function intervalFunction(videos: any[]) {
         console.log(`Current video index: ${videoIndex}`);
 
         // Check if the current video index is within the bounds of the videos array
         if (videos[videoIndex]) {
             // Scroll the current video thumbnail into view
             videos[videoIndex].scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
+
+            // Get the URL of the video from the thumbnail and open it in a new tab
+            const videoLink = videos[videoIndex].querySelector('a').href;
+            chrome.tabs.create({ url: videoLink }, function (tab) {
+                // Close the tab after 5 seconds
+                setTimeout(function () {
+                    chrome.tabs.remove(tab.id);
+                }, 5000);
+            });
+
         } else {
             // Log an error message if the video element at the current index is undefined
             console.log(`Error: video element at index ${videoIndex} is undefined`);
+            clearInterval(interval);
         }
 
         // Increment the video index
@@ -140,21 +151,21 @@ function clickVideos(startIndex: number) {
 
         // Check if the end of the video list has been reached
         if (videoIndex === videos.length) {
-            console.log("End of video list reached");
+            const lastIndex = videoIndex + 1
+            console.log("last clicked video index", videoIndex);
 
-            // Clear the interval to stop clicking on videos
+            // Clear the  last interval function to stop clicking on those videos
             clearInterval(interval);
 
             // Schedule the next round of video clicking after a delay of 5 seconds
             setTimeout(function () {
                 console.log("Restarting video click process...");
-                clickVideos(videoIndex + 1);
+                clickVideos(lastIndex);
             }, 5000);
         }
-    }, 2000, videos)
+    }
 
-    // const interval = setInterval(intervalFunction, 2000);
-
+    const interval = setInterval(intervalFunction, 5000, videos)
 }
 
 

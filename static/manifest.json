@@ -13,7 +13,7 @@
       "run_at": "document_end"
     }
   ],
-  "permissions": ["storage", "scripting", "activeTab"],
+  "permissions": ["storage", "scripting", "activeTab", "tabs"],
   "options_ui": {
     "page": "options.html",
     "open_in_tab": true
