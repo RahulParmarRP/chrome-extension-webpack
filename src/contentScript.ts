@@ -113,108 +113,52 @@ function startLikingVideos() {
     // setTimeout(startLikingVideos, repeatDelay);
 }
 
-// Set the starting index
-let startIndex = 0;
 
-// Define a function to simulate clicking on a video
-function clickVideo(index) {
-    console.log('start');
-
-    // Get the list of videos
+// Start clicking videos from the starting index
+// Define a function to click on all the videos one by one
+function clickVideos(startIndex) {
+    // Get all the videos on the page
     const videos = document.querySelectorAll(YOUTUBE_VIDEO_THUMBNAIL);
-    console.log(videos);
 
-    // Check if the index is within the bounds of the video array
-    if (index < videos.length) {
-        // Scroll the video into view
-        videos[index].scrollIntoView();
-        console.log('scroll', index);
-
-        // Wait for a random delay to simulate human-like interaction
-        const delay = Math.floor(Math.random() * 10000) + 1000;
-
-        setTimeout(function () {
-            // Click the video
-            // videos[index].click();
-            // console.log('click');
-
-            // // Close the video in the new tab and switch back to the original tab
-            // setTimeout(function () {
-            //     window.close();
-            //     window.history.back();
-            // }, 5000); // Wait for 5 seconds before closing the tab
-
-            // Increment the index and click the next video
-            clickVideo(index + 1);
-        }, delay);
-    }
-}
-
-// // Start clicking videos from the starting index
-// clickVideo(startIndex);
-
-
-function scrollDownTillEnd() {
-    let scrollingInterval = setInterval(function () {
-        console.log("scroll");
-        window.scrollBy(0, 1000);
-        if (window.scrollHeight > 10000) {
-            console.log("loop ends");
-            clearInterval(scrollingInterval);
-        }
-    }, 500);
-}
-
-
-
-function scrollVideos() {
-    alert("start");
-    console.log("get videos...");
-    // Get all the video elements
-    const videos = document.querySelectorAll(YOUTUBE_VIDEO_THUMBNAIL);
-    console.log("total videos found ---------", videos);
     // Define the starting index
-    let start = 0;
-    //  keep track of the last video index that was clicked
-    let last_index = start - 1;
+    let videoIndex = startIndex;
 
-    const scrollingInterval = setInterval(function () {
+    // Define an interval to click on the videos
+    const interval = setInterval(function () {
+        console.log(videoIndex);
 
-        if (start > videos.length) {
-            console.log("loop ends");
-            clearInterval(scrollingInterval);
+        // Click on the current video
+        videos[videoIndex].scrollIntoView({ behavior: "smooth", block: "center", inline: "center" })
+
+        // Increment the video index
+        videoIndex++;
+
+        // If the end of the videos is reached
+        if (videoIndex === videos.length) {
+            console.log('end');
+
+            // Stop the interval
+            clearInterval(interval);
+            // Wait for a short delay
+            setTimeout(function () {
+                const lastVideoIndex = videoIndex + 1
+                // Call the function again to start over from the last index
+                clickVideos(lastVideoIndex);
+            }, 5000);
         }
-        let i = start
-        console.log("scroll");
-        window.scrollBy(0, 1000);
-
-        last_index = i
-        i++
-    }, 100);
+    }, 2000);
 }
 
+// Call the function to click on the videos
+// clickVideos();
 
 
 
 window.addEventListener('myCustomEvent', function () {
     console.log('event occurred');
-    // const YOUTUBE_VIDEO_THUMBNAIL = 'ytd-rich-item-renderer.style-scope.ytd-rich-grid-row'
-    // const videos = document.querySelectorAll(YOUTUBE_VIDEO_THUMBNAIL);
-    // const { index } = event.detail;
-    // window.scrollBy(0, event.detail.scrollAmount);
     // videos[index].scrollIntoView({ behavior: "smooth", block: "center", inline: "center" })
-
     // startLikingVideos()
     // scrollDownTillEnd();
-
-
-    // Start clicking videos from the starting index
-    clickVideo(startIndex);
-});
-
-
-
-window.addEventListener('myScroll', function () {
-    console.log('scroll by 10');
-    window.scrollBy(0, 300)
+    // clickVideo(startIndex);
+    clickVideos(8);
 });
