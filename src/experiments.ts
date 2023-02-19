@@ -1,7 +1,7 @@
 let currentIndex = 0;
 let videos = [];
 
-function clickVideos() {
+function clickVideos1() {
     // Get all the video elements on the page
     const videoElements = document.querySelectorAll('ytd-video-renderer');
 
@@ -29,7 +29,7 @@ function clickVideos() {
 }
 
 // Call the function at a regular interval
-setInterval(clickVideos, 5000); // Click on videos every 5 seconds
+setInterval(clickVideos1, 5000); // Click on videos every 5 seconds
 
 
 //---------------------------------------------------------------------------------
@@ -124,7 +124,7 @@ function likeVideo(videoIndex) {
 }
 
 // Define a function to click on all the videos one by one
-function clickVideos() {
+function clickVideos2() {
     // Get all the videos on the page
     const videos = document.querySelectorAll('a#thumbnail');
 
@@ -147,11 +147,11 @@ function clickVideos() {
             // Wait for a short delay
             setTimeout(function () {
                 // Call the function again to start over from the last index
-                clickVideos();
+                clickVideos2();
             }, 1000);
         }
     }, 2000);
 }
 
 // Call the function to click on the videos
-clickVideos();
+clickVideos2();
