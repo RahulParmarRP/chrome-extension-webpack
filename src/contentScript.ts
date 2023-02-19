@@ -135,10 +135,12 @@ function clickVideos(startIndex: number) {
             const videoLink = videos[videoIndex].href;
 
             const newTab = window.open(videoLink, '_blank');
-
             setTimeout(function () {
                 console.log(`Closing video tab: ${newTab}`);
                 newTab.close();
+                chrome.browsingData.removeCache({}, function () {
+                    console.log('Cache cleared.');
+                });
             }, 5000);
 
         } else {
@@ -166,7 +168,7 @@ function clickVideos(startIndex: number) {
         }
     }
 
-    const interval = setInterval(intervalFunction, 7000, videos)
+    const interval = setInterval(intervalFunction, 10000, videos)
 }
 
 
