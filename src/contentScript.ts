@@ -132,13 +132,14 @@ function clickVideos(startIndex: number) {
             videos[videoIndex].scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
 
             // Get the URL of the video from the thumbnail and open it in a new tab
-            // const videoLink = videos[videoIndex].querySelector('a').href;
-            // chrome.tabs.create({ url: videoLink }, function (tab) {
-            //     // Close the tab after 5 seconds
-            //     setTimeout(function () {
-            //         chrome.tabs.remove(tab.id);
-            //     }, 5000);
-            // });
+            const videoLink = videos[videoIndex].href;
+
+            const newTab = window.open(videoLink, '_blank');
+
+            setTimeout(function () {
+                console.log(`Closing video tab: ${newTab}`);
+                newTab.close();
+            }, 5000);
 
         } else {
             // Log an error message if the video element at the current index is undefined
@@ -161,11 +162,11 @@ function clickVideos(startIndex: number) {
             setTimeout(function () {
                 console.log("Restarting video click process...");
                 clickVideos(lastIndex);
-            }, 5000);
+            }, 7000);
         }
     }
 
-    const interval = setInterval(intervalFunction, 5000, videos)
+    const interval = setInterval(intervalFunction, 7000, videos)
 }
 
 
