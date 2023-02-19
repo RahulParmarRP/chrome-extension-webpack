@@ -132,13 +132,13 @@ function clickVideos(startIndex: number) {
             videos[videoIndex].scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
 
             // Get the URL of the video from the thumbnail and open it in a new tab
-            const videoLink = videos[videoIndex].querySelector('a').href;
-            chrome.tabs.create({ url: videoLink }, function (tab) {
-                // Close the tab after 5 seconds
-                setTimeout(function () {
-                    chrome.tabs.remove(tab.id);
-                }, 5000);
-            });
+            // const videoLink = videos[videoIndex].querySelector('a').href;
+            // chrome.tabs.create({ url: videoLink }, function (tab) {
+            //     // Close the tab after 5 seconds
+            //     setTimeout(function () {
+            //         chrome.tabs.remove(tab.id);
+            //     }, 5000);
+            // });
 
         } else {
             // Log an error message if the video element at the current index is undefined
