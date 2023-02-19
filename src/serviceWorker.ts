@@ -4,7 +4,8 @@ chrome.runtime.onInstalled.addListener(async () => {
   // Here goes everything you want to execute after extension initialization
 
   await initializeStorageWithDefaults({});
-
+  // const t = document.querySelector('a#thumbnail')
+  // console.log(t);
   console.log('Extension successfully installed!');
 });
 
