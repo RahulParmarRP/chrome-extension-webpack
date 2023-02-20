@@ -113,6 +113,43 @@ function startLikingVideos() {
     // setTimeout(startLikingVideos, repeatDelay);
 }
 
+function likeVideo(videoLink, callback) {
+    chrome.tabs.create({ url: videoLink }, function (newTab) {
+        chrome.tabs.executeScript(newTab.id, {
+            code: `
+        const likeButton = document.querySelector('${YOUTUBE_VIDEO_LIKE_BUTTON}');
+        if (likeButton) {
+          if (!Bool(likeButton.getAttribute('aria-pressed'))) {
+            likeButton.click();
+          }
+        }
+      `
+        }, function () {
+            chrome.tabs.remove(newTab.id);
+            callback();
+        });
+    });
+}
+
+
+function likeVideo() {
+    try {
+        const likeButton = document.querySelectorAll(YOUTUBE_VIDEO_LIKE_BUTTON);
+        if (likeButton?.length) {
+            const button = likeButton[0];
+            const isLiked = button.getAttribute("aria-pressed");
+            console.log(`Is video liked: ${isLiked}`);
+            if (isLiked === 'true') {
+                console.log("Already liked");
+            } else {
+                button.click();
+                console.log("Liked");
+            }
+        }
+    } catch (e) {
+        console.log("Some error occurred while liking the video");
+    }
+}
 
 function clickVideos(startIndex: number) {
     // Get all video thumbnails on the page
@@ -170,12 +207,6 @@ function clickVideos(startIndex: number) {
 
     const interval = setInterval(intervalFunction, 10000, videos)
 }
-
-
-
-// Call the function to click on the videos
-// clickVideos();
-
 
 
 window.addEventListener('myCustomEvent', function () {

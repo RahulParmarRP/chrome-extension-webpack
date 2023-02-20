@@ -155,3 +155,65 @@ function clickVideos2() {
 
 // Call the function to click on the videos
 clickVideos2();
+
+
+//--------------------------------------------------------------------------------------
+
+
+
+function clickVideos(startIndex) {
+    const videos = document.querySelectorAll(YOUTUBE_VIDEO_THUMBNAIL);
+    console.log("new count of the total videos", videos);
+
+    let videoIndex = startIndex;
+
+    const interval = setInterval((function (videos) {
+        if (console.log(`Current video index: ${videoIndex}`), videos[videoIndex]) {
+            videos[videoIndex].scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
+
+            const videoLink = videos[videoIndex].href;
+            const newTab = window.open(videoLink, "_blank");
+
+            setTimeout((function () {
+                likeVideo();
+                console.log(`Closing video tab: ${newTab}`);
+                newTab.close();
+                chrome.browsingData.removeCache({}, (function () {
+                    console.log("Cache cleared.");
+                }))
+            }), 5000);
+        } else {
+            console.log(`Error: video element at index ${videoIndex} is undefined`);
+            clearInterval(interval);
+        }
+
+        if (videoIndex++, videoIndex === videos.length) {
+            const lastIndex = videoIndex + 1;
+            console.log("last clicked video index", videoIndex);
+            clearInterval(interval);
+            setTimeout((function () {
+                console.log("Restarting video click process...");
+                clickVideos(lastIndex);
+            }), 7000);
+        }
+    }), 10000, videos);
+
+    function likeVideo() {
+        try {
+            const likeButton = document.querySelectorAll(YOUTUBE_VIDEO_LIKE_BUTTON);
+            if (likeButton?.length) {
+                const button = likeButton[0];
+                const isLiked = button.getAttribute("aria-pressed");
+                console.log(`Is video liked: ${isLiked}`);
+                if (isLiked === 'true') {
+                    console.log("Already liked");
+                } else {
+                    button.click();
+                    console.log("Liked");
+                }
+            }
+        } catch (e) {
+            console.log("Some error occurred while liking the video");
+        }
+    }
+}
