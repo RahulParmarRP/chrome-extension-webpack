@@ -113,7 +113,8 @@ function startLikingVideos() {
     // setTimeout(startLikingVideos, repeatDelay);
 }
 
-function likeVideo(videoLink, callback) {
+function likeYoutubeVideo(videoLink: any, callback: { (): void; (): void; }) {
+
     chrome.tabs.create({ url: videoLink }, function (newTab) {
         chrome.tabs.executeScript(newTab.id, {
             code: `
@@ -132,7 +133,7 @@ function likeVideo(videoLink, callback) {
 }
 
 
-function likeVideo() {
+function likeVideo2() {
     try {
         const likeButton = document.querySelectorAll(YOUTUBE_VIDEO_LIKE_BUTTON);
         if (likeButton?.length) {
@@ -171,19 +172,23 @@ function clickVideos(startIndex: number) {
             // Get the URL of the video from the thumbnail and open it in a new tab
             const videoLink = videos[videoIndex].href;
 
-            const newTab = window.open(videoLink, '_blank');
-            setTimeout(function () {
-                console.log(`Closing video tab: ${newTab}`);
-                newTab.close();
-                chrome.browsingData.removeCache({}, function () {
-                    console.log('Cache cleared.');
+            chrome.tabs.create({ url: videoLink }, function (newTab) {
+                chrome.tabs.executeScript(newTab.id, {
+                    code: `
+        const likeButton = document.querySelector('${YOUTUBE_VIDEO_LIKE_BUTTON}');
+        if (likeButton) {
+          if (!Bool(likeButton.getAttribute('aria-pressed'))) {
+            likeButton.click();
+          }
+        }
+      `
+                }, function () {
+                    chrome.tabs.remove(newTab.id);
+                    chrome.browsingData.removeCache({}, function () {
+                        console.log('Cache cleared.');
+                    })
                 });
-            }, 5000);
-
-        } else {
-            // Log an error message if the video element at the current index is undefined
-            console.log(`Error: video element at index ${videoIndex} is undefined`);
-            clearInterval(interval);
+            });
         }
 
         // Increment the video index
@@ -215,5 +220,7 @@ window.addEventListener('myCustomEvent', function () {
     // startLikingVideos()
     // scrollDownTillEnd();
     // clickVideo(startIndex);
-    clickVideos(8);
+    // clickVideos(8);
 });
+
+chrome.tabs.create({ url: "https://www.youtube.com/@sadhguru" })

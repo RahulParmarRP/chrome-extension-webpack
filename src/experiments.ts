@@ -161,7 +161,7 @@ clickVideos2();
 
 
 
-function clickVideos(startIndex) {
+function clickVideos4(startIndex) {
     const videos = document.querySelectorAll(YOUTUBE_VIDEO_THUMBNAIL);
     console.log("new count of the total videos", videos);
 
@@ -193,7 +193,7 @@ function clickVideos(startIndex) {
             clearInterval(interval);
             setTimeout((function () {
                 console.log("Restarting video click process...");
-                clickVideos(lastIndex);
+                clickVideos4(lastIndex);
             }), 7000);
         }
     }), 10000, videos);
