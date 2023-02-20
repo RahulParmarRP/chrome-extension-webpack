@@ -1,5 +1,5 @@
 let currentIndex = 0;
-let videos = [];
+let videos: string | any[] = [];
 
 function clickVideos1() {
     // Get all the video elements on the page
@@ -38,7 +38,7 @@ setInterval(clickVideos1, 5000); // Click on videos every 5 seconds
 let startIndex = 0;
 
 // Define a function to simulate clicking on a video
-function clickVideo(index) {
+function clickVideo(index: number) {
     console.log('start');
 
     // Get the list of videos
@@ -93,7 +93,7 @@ function clickVideo(index) {
 
 //---------------------------------------------------------------------------------------
 // Define a function to open a video in a new tab, hit the like button and close the tab
-function likeVideo(videoIndex) {
+function likeVideo(videoIndex: string | number) {
     // Get the URL of the video to open
     const videoURL = document.querySelectorAll('a#thumbnail')[videoIndex].href;
 
@@ -161,7 +161,7 @@ clickVideos2();
 
 
 
-function clickVideos4(startIndex) {
+function clickVideos4(startIndex: any) {
     const videos = document.querySelectorAll(YOUTUBE_VIDEO_THUMBNAIL);
     console.log("new count of the total videos", videos);
 
@@ -216,4 +216,37 @@ function clickVideos4(startIndex) {
             console.log("Some error occurred while liking the video");
         }
     }
+}
+
+
+// ----------------------------------------------------------------------------------------
+
+// background.js
+
+// Listen for messages from content scripts
+chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
+    if (message.action === "likeVideo") {
+        likeVideo5(message.videoLink, function () {
+            sendResponse({ result: "success" });
+        });
+    }
+});
+
+// Function to like a YouTube video by opening it in a new tab and clicking the like button
+function likeVideo5(videoLink: any, callback: { (): void; (): void; }) {
+    chrome.tabs.create({ url: videoLink }, function (newTab) {
+        chrome.tabs.executeScript(newTab.id, {
+            code: `
+        const likeButton = document.querySelector('${YOUTUBE_VIDEO_LIKE_BUTTON}');
+        if (likeButton) {
+          if (!likeButton.getAttribute('aria-pressed')) {
+            likeButton.click();
+          }
+        }
+      `
+        }, function () {
+            chrome.tabs.remove(newTab.id);
+            callback();
+        });
+    });
 }

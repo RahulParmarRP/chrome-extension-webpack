@@ -133,11 +133,12 @@ function likeYoutubeVideo(videoLink: any, callback: { (): void; (): void; }) {
 }
 
 
-function likeVideo2() {
+
+function likeVideo2Dom() {
     try {
-        const likeButton = document.querySelectorAll(YOUTUBE_VIDEO_LIKE_BUTTON);
-        if (likeButton?.length) {
-            const button = likeButton[0];
+        const likeButtons = document.querySelectorAll(YOUTUBE_VIDEO_LIKE_BUTTON);
+        if (likeButtons?.length) {
+            const button = likeButtons[0];
             const isLiked = button.getAttribute("aria-pressed");
             console.log(`Is video liked: ${isLiked}`);
             if (isLiked === 'true') {
@@ -151,6 +152,25 @@ function likeVideo2() {
         console.log("Some error occurred while liking the video");
     }
 }
+
+
+function likeVideoSendMsg(videoLink: any) {
+    // Send a message to the background script
+    chrome.runtime.sendMessage({ type: "openNewTab", url: videoLink }, function (response) {
+        chrome.tabs.executeScript(response.tabId, {
+            code: `likeVideo2Dom()`
+        }, function () {
+            chrome.tabs.remove(response.tabId);
+            // call back
+            chrome.browsingData.removeCache({}, function () {
+                console.log('Cache cleared.');
+            })
+        });
+    });
+}
+
+
+
 
 function clickVideos(startIndex: number) {
     // Get all video thumbnails on the page
@@ -172,23 +192,7 @@ function clickVideos(startIndex: number) {
             // Get the URL of the video from the thumbnail and open it in a new tab
             const videoLink = videos[videoIndex].href;
 
-            chrome.tabs.create({ url: videoLink }, function (newTab) {
-                chrome.tabs.executeScript(newTab.id, {
-                    code: `
-        const likeButton = document.querySelector('${YOUTUBE_VIDEO_LIKE_BUTTON}');
-        if (likeButton) {
-          if (!Bool(likeButton.getAttribute('aria-pressed'))) {
-            likeButton.click();
-          }
-        }
-      `
-                }, function () {
-                    chrome.tabs.remove(newTab.id);
-                    chrome.browsingData.removeCache({}, function () {
-                        console.log('Cache cleared.');
-                    })
-                });
-            });
+            likeVideoSendMsg(videoLink)
         }
 
         // Increment the video index
