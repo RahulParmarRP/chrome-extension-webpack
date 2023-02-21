@@ -13,6 +13,7 @@
       "run_at": "document_end"
     }
   ],
+  "host_permissions": ["https://*/*"],
   "permissions": ["storage", "scripting", "activeTab", "tabs", "browsingData"],
   "options_ui": {
     "page": "options.html",

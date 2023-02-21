@@ -181,6 +181,4 @@ likeVideos.addEventListener('click', async () => {
     func: showAlert,
     // func: startLikingVideos,
   });
-  chrome.tabs.create({ url: "https://www.youtube.com/@sadhguru/videos" })
-
 });

@@ -3,6 +3,17 @@ console.log('content script loaded');
 const YOUTUBE_VIDEO_THUMBNAIL = 'ytd-rich-item-renderer.style-scope.ytd-rich-grid-row a#thumbnail'
 const YOUTUBE_VIDEO_LIKE_BUTTON = '#segmented-like-button > ytd-toggle-button-renderer > yt-button-shape > button'
 
+
+
+const delay = (seconds = 3) => {
+    const start = new Date().getTime();
+    let end = start;
+    while (end < start + seconds * 1000) {
+        end = new Date().getTime();
+    }
+};
+
+
 function startLikingVideos() {
 
     const delay = (seconds = 3) => {
@@ -157,18 +168,34 @@ function likeVideo2Dom() {
 function likeVideoSendMsg(videoLink: any) {
     // Send a message to the background script
     chrome.runtime.sendMessage({ type: "openNewTab", url: videoLink }, function (response) {
-        chrome.tabs.executeScript(response.tabId, {
-            code: `likeVideo2Dom()`
-        }, function () {
-            chrome.tabs.remove(response.tabId);
-            // call back
-            chrome.browsingData.removeCache({}, function () {
-                console.log('Cache cleared.');
-            })
-        });
+        // chrome.tabs.executeScript(response.tabId, {
+        //     code: `likeVideo2Dom()`
+        // }, function () {
+        //     chrome.tabs.remove(response.tabId);
+        //     // call back
+        //     chrome.browsingData.removeCache({}, function () {
+        //         console.log('Cache cleared.');
+        //     })
+        // });
     });
 }
 
+// Listen for messages from the background script
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+    if (request.action === "tabCreated") {
+        // Do something with the newly created tab
+        console.log("tab created", request.tab);
+        // chrome.tabs.executeScript(response.tabId, {
+        //     code: `likeVideo2Dom()`
+        // }, function () {
+        //     chrome.tabs.remove(response.tabId);
+        //     // call back
+        //     chrome.browsingData.removeCache({}, function () {
+        //         console.log('Cache cleared.');
+        //     })
+        // });
+    }
+});
 
 
 
@@ -214,7 +241,7 @@ function clickVideos(startIndex: number) {
         }
     }
 
-    const interval = setInterval(intervalFunction, 10000, videos)
+    const interval = setInterval(intervalFunction, 20000, videos)
 }
 
 
@@ -224,7 +251,7 @@ window.addEventListener('myCustomEvent', function () {
     // startLikingVideos()
     // scrollDownTillEnd();
     // clickVideo(startIndex);
-    // clickVideos(8);
+    clickVideos(8);
 });
 
-chrome.tabs.create({ url: "https://www.youtube.com/@sadhguru" })
+// chrome.tabs.create({ url: "https://www.youtube.com/@sadhguru" })
