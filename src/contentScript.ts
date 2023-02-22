@@ -251,7 +251,9 @@ window.addEventListener('myCustomEvent', function () {
     // startLikingVideos()
     // scrollDownTillEnd();
     // clickVideo(startIndex);
-    clickVideos(8);
+    // clickVideos(8);
+    likeVideoSendMsg('https://www.youtube.com/watch?v=VbeM8Lf7s5A')
+
 });
 
 // chrome.tabs.create({ url: "https://www.youtube.com/@sadhguru" })
