@@ -176,26 +176,35 @@ function likeVideo2Dom() {
 }
 
 
-function likeVideoSendMsg(videoLink: any) {
+async function likeVideoSendMsg(videoLink: any) {
+    const result = await chrome.runtime.sendMessage({ greeting: "hello", videoLink });
+
+    // do something with response here, not outside the function
+    console.log('received result in content', result);
+
+
     // Send a message to the background script
-    chrome.runtime.sendMessage({ type: "openNewTabFromContentScriptToServiceWorker", url: videoLink }, function (response) {
-        console.log('likeVideoSendMsg got response', response);
-        if (response.action === 'openedTabFromServiceWorkerToContentScript') {
+    // const result2 = await chrome.runtime.sendMessage({ type: "openNewTabFromContentScriptToServiceWorker", url: videoLink })
+    // console.log("new tab received in content script", result2);
 
-            const newTab = response.tab
-            console.log("new tab received in content script", newTab);
+    // result2.then(function (response: { action: string; tab: any; }) {
+    //     console.log('likeVideoSendMsg got response', response);
+    //     if (response.action === 'openedTabFromServiceWorkerToContentScript') {
 
-        }
-        // chrome.tabs.executeScript(response.tabId, {
-        //     code: `likeVideo2Dom()`
-        // }, function () {
-        //     chrome.tabs.remove(response.tabId);
-        //     // call back
-        //     chrome.browsingData.removeCache({}, function () {
-        //         console.log('Cache cleared.');
-        //     })
-        // });
-    });
+    //         const newTab = response.tab
+    //         console.log("new tab received in content script", newTab);
+
+    //     }
+    //     // chrome.tabs.executeScript(response.tabId, {
+    //     //     code: `likeVideo2Dom()`
+    //     // }, function () {
+    //     //     chrome.tabs.remove(response.tabId);
+    //     //     // call back
+    //     //     chrome.browsingData.removeCache({}, function () {
+    //     //         console.log('Cache cleared.');
+    //     //     })
+    //     // });
+    // })
 }
 
 const showAlert = () => {
@@ -223,7 +232,9 @@ const showAlert = () => {
 
 // Listen for messages from the background script
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
-    debugger
+
+    console.log(message);
+
     console.log("received at content script tabCreatedFromServiceWorkerSendToContentScript");
 
     if (message.action === "tabCreatedFromServiceWorkerSendToContentScript") {

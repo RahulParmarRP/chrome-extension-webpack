@@ -94,104 +94,152 @@ const showAlert = () => {
   }
 }
 
+// chrome.runtime.onMessage.addListener(async function (message, sender, sendResponse) {
+//   if (message.type === "openNewTabFromContentScriptToServiceWorker") {
+//     const result3 = await chrome.tabs.create({ url: message.url });
+
+//     // Instead of using sendResponse, use chrome.runtime.sendMessage to send the response
+//     chrome.runtime.sendMessage({ action: "openedTabFromServiceWorkerToContentScript", testData: 'test', result: result3 }, function (response) {
+//       console.log(response);
+//     });
+
+//     // You should not use sendResponse after chrome.runtime.sendMessage
+//     // sendResponse({result: result3});
+
+//     // Make sure to return a Promise from the listener function
+//     return Promise.resolve();
+//   }
+// });
+
 
 
 // Listen for messages from the content script
-chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
-  if (message.type === "openNewTabFromContentScriptToServiceWorker") {
-    console.log('trying open new tab from service worker');
-    // sendResponse({ action: "tabCreated" });
-    // chrome.runtime.sendMessage({ action: "openNewTabFromContentScriptToServiceWorker" })
-
-    const callbacktosend = (tab) => {
-      sendResponse({ action: "openedTabFromServiceWorkerToContentScript", tab })
-    }
-
-    console.log("tabCreatedFromServiceWorkerSendToContentScript");
-    sendResponse({ action: "openedTabFromServiceWorkerToContentScript" })
-
-    /*
-    // Open the video in a new tab
-    chrome.tabs.create({ url: message.url }, function (tab) {
-      // Add an event listener to the new tab to wait for the page to load
-      chrome.tabs.onUpdated.addListener(function listener(tabId, changeInfo) {
-        // If the page has finished loading
-        if (tabId === tab.id && changeInfo.status === 'complete') {
-          // Remove the event listener
-          chrome.tabs.onUpdated.removeListener(listener);
-          // debugger
-          // syncDelay(20)
-          // debugger
-          console.log('tabCreated from service worker', tab);
-          callbacktosend(tab)
-          // sendResponse({ action: "openedTabFromServiceWorkerToContentScript", tab })
-          console.log('sent tab to content script', tab);
-
-          // const likeButtons = document.querySelectorAll(YOUTUBE_VIDEO_LIKE_BUTTON);
-          // if (likeButtons?.length) {
-          //   const button = likeButtons[0];
-          //   const isLiked = button.getAttribute("aria-pressed");
-          //   console.log(`Is video liked: ${isLiked}`);
-          //   if (isLiked === 'true') {
-          //     console.log("Already liked");
-          //   } else {
-          //     button.click();
-          //     console.log("Liked");
-          //   }
-          // }
-          // Find the like button on the new page and click it
-          // chrome.scripting.executeScript({
-          //   target: { tabId: newTab.id },
-          //   // files: ["script.js"],
-          //   func: showAlert,
-          //   // args: ['script executed']
-          // }, function () {
-
-          //   setTimeout(() => {
-          //     // Close the new tab
-          //     chrome.tabs.remove(newTab.id);
-          //   }, 4000)
+// chrome.runtime.onMessage.addListener(async function (message, sender, sendResponse) {
 
 
-          //   // Switch back to the original tab
-          //   // chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-          //   //   chrome.tabs.update(tabs[0].id, { active: true });
-          //   // });
-          // });
+//   if (message.type === "openNewTabFromContentScriptToServiceWorker") {
+//     console.log('trying open new tab from service worker');
+//     // sendResponse({ action: "tabCreated" });
+//     // chrome.runtime.sendMessage({ action: "openNewTabFromContentScriptToServiceWorker" })
+
+//     const callbacktosend = (tab: any) => {
+//       sendResponse({ action: "openedTabFromServiceWorkerToContentScript", tab })
+//     }
+
+//     console.log("tabCreatedFromServiceWorkerSendToContentScript", sender);
+//     // sendResponse({ action: "openedTabFromServiceWorkerToContentScript" })
+
+//     /*
+//     // Open the video in a new tab
+//     chrome.tabs.create({ url: message.url }, function (tab) {
+//       // Add an event listener to the new tab to wait for the page to load
+//       chrome.tabs.onUpdated.addListener(function listener(tabId, changeInfo) {
+//         // If the page has finished loading
+//         if (tabId === tab.id && changeInfo.status === 'complete') {
+//           // Remove the event listener
+//           chrome.tabs.onUpdated.removeListener(listener);
+//           // debugger
+//           // syncDelay(20)
+//           // debugger
+//           console.log('tabCreated from service worker', tab);
+//           callbacktosend(tab)
+//           // sendResponse({ action: "openedTabFromServiceWorkerToContentScript", tab })
+//           console.log('sent tab to content script', tab);
+
+//           // const likeButtons = document.querySelectorAll(YOUTUBE_VIDEO_LIKE_BUTTON);
+//           // if (likeButtons?.length) {
+//           //   const button = likeButtons[0];
+//           //   const isLiked = button.getAttribute("aria-pressed");
+//           //   console.log(`Is video liked: ${isLiked}`);
+//           //   if (isLiked === 'true') {
+//           //     console.log("Already liked");
+//           //   } else {
+//           //     button.click();
+//           //     console.log("Liked");
+//           //   }
+//           // }
+//           // Find the like button on the new page and click it
+//           // chrome.scripting.executeScript({
+//           //   target: { tabId: newTab.id },
+//           //   // files: ["script.js"],
+//           //   func: showAlert,
+//           //   // args: ['script executed']
+//           // }, function () {
+
+//           //   setTimeout(() => {
+//           //     // Close the new tab
+//           //     chrome.tabs.remove(newTab.id);
+//           //   }, 4000)
 
 
-        }
+//           //   // Switch back to the original tab
+//           //   // chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+//           //   //   chrome.tabs.update(tabs[0].id, { active: true });
+//           //   // });
+//           // });
+
+
+//         }
+//       });
+//     });
+//     */
+
+//     // Use the chrome.tabs API to open a new tab
+//     const result3 = await chrome.tabs.create({ url: message.url })
+//     sendResponse({ action: "openedTabFromServiceWorkerToContentScript", testData: 'test', result3 });
+
+//     // .
+//     //   then(function (tab) {
+
+//     //     // chrome.scripting.executeScript({
+//     //     //   target: { tabId: tab.id },
+//     //     //   // files: ["script.js"],
+//     //     //   func: showAlert,
+//     //     //   // args: ['script executed']
+//     //     // })
+//     //     //   .then(function () {
+
+//     //     //     delay(15)
+//     //     //     alert('removal')
+//     //     //     // likeVideo2Dom()
+//     //     //     // delay()
+//     //     //     console.log('close tab');
+//     //     //     chrome.tabs.remove(tab.id);
+//     //     //     // call back
+//     //     //     chrome.browsingData.removeCache({}, function () {
+//     //     //       console.log('Cache cleared.');
+//     //     //     })
+//     //     //   });
+
+//     //     // Send a message back to the content script to let it know that the tab has been created
+//     //     sendResponse({ action: "tabCreated", tab });
+//     //   });
+
+//   }
+// });
+
+
+chrome.runtime.onMessage.addListener(
+  async function (request, sender, sendResponse) {
+    console.log(sender.tab ?
+      "from a content script:" + sender.tab.url :
+      "from the extension");
+    console.log(request);
+    // const tab = await chrome.tabs.create({ url: request.videoLink });
+
+    chrome.tabs.create({ url: "https://www.example.com" }, function (tab) {
+      chrome.tabs.executeScript(tab.id, { file: "contentScript.js" }, function () {
+        chrome.tabs.sendMessage(tab.id, { message: "Hello from background script!" });
       });
     });
-    */
 
-    // // Use the chrome.tabs API to open a new tab
-    // chrome.tabs.create({ url: request.url }).
-    //   then(function (tab) {
 
-    //     chrome.scripting.executeScript({
-    //       target: { tabId: tab.id },
-    //       // files: ["script.js"],
-    //       func: showAlert,
-    //       // args: ['script executed']
-    //     })
-    //       .then(function () {
+    const tab = "test"
+    console.log("tatadasfd", tab);
 
-    //         delay(15)
-    //         alert('removal')
-    //         // likeVideo2Dom()
-    //         // delay()
-    //         console.log('close tab');
-    //         chrome.tabs.remove(tab.id);
-    //         // call back
-    //         chrome.browsingData.removeCache({}, function () {
-    //           console.log('Cache cleared.');
-    //         })
-    //       });
-
-    //     // Send a message back to the content script to let it know that the tab has been created
-    //     sendResponse({ action: "tabCreated", tab: tab });
-    //   });
-
+    if (request.greeting === "hello") {
+      console.log('SEND TO CONTENT ');
+      sendResponse({ farewell: "goodbye", tab });
+    }
   }
-});
+);
