@@ -25,7 +25,6 @@ function syncDelay(seconds) {
 
 function likeVideo2Dom() {
   // alert('like')
-
 }
 
 chrome.runtime.onInstalled.addListener(async () => {
@@ -221,16 +220,19 @@ const showAlert = () => {
 
 chrome.runtime.onMessage.addListener(
   async function (request, sender, sendResponse) {
-    console.log(sender.tab ?
-      "from a content script:" + sender.tab.url :
-      "from the extension");
+    console.log("received from content script but inside the service worker", sender);
     console.log(request);
     // const tab = await chrome.tabs.create({ url: request.videoLink });
 
-    chrome.tabs.create({ url: "https://www.example.com" }, function (tab) {
-      chrome.tabs.executeScript(tab.id, { file: "contentScript.js" }, function () {
-        chrome.tabs.sendMessage(tab.id, { message: "Hello from background script!" });
-      });
+    chrome.tabs.create({ url: request.videoLink }, function (tab) {
+      chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        files: ["contentScript.js"],
+      }, function () {
+        chrome.tabs.sendMessage(tab.id, { action: "readyForLike", tab });
+        // send to main tab
+        // chrome.tabs.sendMessage(sender.tab.id, { message: "Hello from background script!", tab });
+      })
     });
 
 

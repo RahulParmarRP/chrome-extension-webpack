@@ -155,6 +155,18 @@ function likeYoutubeVideo(videoLink: any, callback: { (): void; (): void; }) {
 }
 
 
+function checkLikeButton() {
+    return new Promise<void>((resolve, reject) => {
+        const checkInterval = setInterval(() => {
+            const likeButton = document.querySelector(YOUTUBE_VIDEO_LIKE_BUTTON)
+            if (likeButton) {
+                clearInterval(checkInterval);
+                resolve();
+            }
+        }, 500);
+    });
+}
+
 
 function likeVideo2Dom() {
     try {
@@ -176,9 +188,36 @@ function likeVideo2Dom() {
 }
 
 
+// Listen for messages from the background script
+chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
+    console.log("received at content script");
+    const newTab = message.tab
+    // chrome.tabs.remove(newTab.id);
+
+    // Do something with the newly created tab
+    console.log(message);
+    console.log("window", window);
+    console.log("window.document", window.document);
+    console.log("newly created tab", newTab);
+
+    checkLikeButton()
+        .then(() => {
+
+            console.log('button ready to be clicked');
+
+            likeVideo2Dom()
+            setTimeout(() => {
+                console.log('close');
+
+                window.close()
+            }, 7000)
+        })
+
+
+});
+
 async function likeVideoSendMsg(videoLink: any) {
     const result = await chrome.runtime.sendMessage({ greeting: "hello", videoLink });
-
     // do something with response here, not outside the function
     console.log('received result in content', result);
 
@@ -230,53 +269,6 @@ const showAlert = () => {
     }
 }
 
-// Listen for messages from the background script
-chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
-
-    console.log(message);
-
-    console.log("received at content script tabCreatedFromServiceWorkerSendToContentScript");
-
-    if (message.action === "tabCreatedFromServiceWorkerSendToContentScript") {
-        // Do something with the newly created tab
-        console.log("tabCreatedFromServiceWorkerSendToContentScript");
-
-        /*
-                const newTab = message.tab
-                //  Find the like button on the new page and click it
-                chrome.scripting.executeScript({
-                    target: { tabId: newTab.id },
-                    // files: ["script.js"],
-                    func: showAlert,
-                    // args: ['script executed']
-                }, function () {
-        
-                    setTimeout(() => {
-                        // Close the new tab
-                        chrome.tabs.remove(newTab.id);
-                    }, 4000)
-        
-        
-                    // Switch back to the original tab
-                    // chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-                    //   chrome.tabs.update(tabs[0].id, { active: true });
-                    // });
-                });
-        */
-
-
-
-        // chrome.tabs.executeScript(response.tabId, {
-        //     code: `likeVideo2Dom()`
-        // }, function () {
-        //     chrome.tabs.remove(response.tabId);
-        //     // call back
-        //     chrome.browsingData.removeCache({}, function () {
-        //         console.log('Cache cleared.');
-        //     })
-        // });
-    }
-});
 
 
 
@@ -333,7 +325,8 @@ window.addEventListener('myCustomEvent', function () {
     // scrollDownTillEnd();
     // clickVideo(startIndex);
     // clickVideos(8);
-    likeVideoSendMsg('https://www.youtube.com/watch?v=VbeM8Lf7s5A')
+    const videos = document.querySelectorAll(YOUTUBE_VIDEO_THUMBNAIL);
+    likeVideoSendMsg(videos[8].href)
 
 });
 
