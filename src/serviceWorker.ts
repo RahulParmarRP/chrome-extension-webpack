@@ -220,28 +220,20 @@ const showAlert = () => {
 
 chrome.runtime.onMessage.addListener(
   async function (request, sender, sendResponse) {
-    console.log("received from content script but inside the service worker", sender);
-    console.log(request);
-    // const tab = await chrome.tabs.create({ url: request.videoLink });
-
-    chrome.tabs.create({ url: request.videoLink }, function (tab) {
-      chrome.scripting.executeScript({
-        target: { tabId: tab.id },
-        files: ["contentScript.js"],
-      }, function () {
-        chrome.tabs.sendMessage(tab.id, { action: "readyForLike", tab });
-        // send to main tab
-        // chrome.tabs.sendMessage(sender.tab.id, { message: "Hello from background script!", tab });
-      })
-    });
-
-
-    const tab = "test"
-    console.log("tatadasfd", tab);
-
-    if (request.greeting === "hello") {
-      console.log('SEND TO CONTENT ');
-      sendResponse({ farewell: "goodbye", tab });
+    if (request.action === "createTab") {
+      console.log("inside the service worker request received", request);
+      chrome.tabs.create({ url: request.url }, function (createdTab) {
+        console.log("tab created", createdTab);
+        chrome.scripting.executeScript({
+          target: { tabId: createdTab.id },
+          files: ["contentScript.js"],
+        }, function () {
+          console.log('send message to the content script of the created tab that it is ready to be liked');
+          chrome.tabs.sendMessage(createdTab.id, { action: "readyToBeLiked", createdTab });
+          // send to main tab
+          // chrome.tabs.sendMessage(sender.tab.id, { message: "Hello from background script!", tab });
+        })
+      });
     }
   }
 );

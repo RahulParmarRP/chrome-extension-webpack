@@ -190,60 +190,27 @@ function likeVideo2Dom() {
 
 // Listen for messages from the background script
 chrome.runtime.onMessage.addListener(function (message, sender, sendResponse) {
-    console.log("received at content script");
-    const newTab = message.tab
-    // chrome.tabs.remove(newTab.id);
-
-    // Do something with the newly created tab
-    console.log(message);
-    console.log("window", window);
-    console.log("window.document", window.document);
-    console.log("newly created tab", newTab);
-
-    checkLikeButton()
-        .then(() => {
-
-            console.log('button ready to be clicked');
-
-            likeVideo2Dom()
-            setTimeout(() => {
-                console.log('close');
-
-                window.close()
-            }, 7000)
-        })
-
-
+    console.log("received at content script", message, sender);
+    if (message.action === "readyToBeLiked") {
+        // Do something with the newly created tab
+        console.log("window", window);
+        console.log("newly created tab", message.createdTab);
+        checkLikeButton()
+            .then(() => {
+                console.log('like button ready to be clicked');
+                likeVideo2Dom()
+                setTimeout(() => {
+                    console.log('at last close the window regardless of error');
+                    window.close()
+                }, 20000)
+            })
+    }
 });
 
-async function likeVideoSendMsg(videoLink: any) {
-    const result = await chrome.runtime.sendMessage({ greeting: "hello", videoLink });
-    // do something with response here, not outside the function
-    console.log('received result in content', result);
-
-
+async function initiateServiceWorkerToCreateTab(url: string) {
     // Send a message to the background script
-    // const result2 = await chrome.runtime.sendMessage({ type: "openNewTabFromContentScriptToServiceWorker", url: videoLink })
-    // console.log("new tab received in content script", result2);
-
-    // result2.then(function (response: { action: string; tab: any; }) {
-    //     console.log('likeVideoSendMsg got response', response);
-    //     if (response.action === 'openedTabFromServiceWorkerToContentScript') {
-
-    //         const newTab = response.tab
-    //         console.log("new tab received in content script", newTab);
-
-    //     }
-    //     // chrome.tabs.executeScript(response.tabId, {
-    //     //     code: `likeVideo2Dom()`
-    //     // }, function () {
-    //     //     chrome.tabs.remove(response.tabId);
-    //     //     // call back
-    //     //     chrome.browsingData.removeCache({}, function () {
-    //     //         console.log('Cache cleared.');
-    //     //     })
-    //     // });
-    // })
+    chrome.runtime.sendMessage({ action: "createTab", url });
+    console.log('sent message to service worker for tab creation');
 }
 
 const showAlert = () => {
@@ -292,7 +259,7 @@ function clickVideos(startIndex: number) {
             // Get the URL of the video from the thumbnail and open it in a new tab
             const videoLink = videos[videoIndex].href;
 
-            likeVideoSendMsg(videoLink)
+            initiateServiceWorkerToCreateTab(videoLink)
         }
 
         // Increment the video index
@@ -326,8 +293,6 @@ window.addEventListener('myCustomEvent', function () {
     // clickVideo(startIndex);
     // clickVideos(8);
     const videos = document.querySelectorAll(YOUTUBE_VIDEO_THUMBNAIL);
-    likeVideoSendMsg(videos[8].href)
-
+    initiateServiceWorkerToCreateTab(videos[8].href)
 });
 
-// chrome.tabs.create({ url: "https://www.youtube.com/@sadhguru" })
